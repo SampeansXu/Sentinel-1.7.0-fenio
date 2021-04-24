@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.alibaba.csp</groupId>
         <artifactId>sentinel-parent</artifactId>
-        <version>1.7.0</version>
+        <version>1.8.0</version>
     </parent>
 
     <artifactId>sentinel-dashboard</artifactId>
@@ -102,7 +102,8 @@
         <dependency>
             <groupId>com.alibaba.csp</groupId>
             <artifactId>sentinel-datasource-nacos</artifactId>
-            <scope>test</scope>
+            <!-- by fenio for rules save to nacos -->
+            <!-- <scope>test</scope>-->
         </dependency>
         <!-- for Apollo rule publisher sample -->
         <dependency>
@@ -131,10 +132,17 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-        	<groupId>com.github.stefanbirkner</groupId>
-        	<artifactId>system-rules</artifactId>
-        	<version>1.16.1</version>
-        	<scope>test</scope>
+            <groupId>com.github.stefanbirkner</groupId>
+            <artifactId>system-rules</artifactId>
+            <version>1.16.1</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- by fenio for rules save to nacos -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.16.20</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 

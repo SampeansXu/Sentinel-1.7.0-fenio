@@ -1,5 +1,91 @@
 # Sentinel 控制台
 
+## 编译和启动
+```bash
+mvn clean install -DskipTests
+```
+```bash
+java -Dserver.port=8088 \
+-Dcsp.sentinel.dashboard.server=localhost:8080 \
+-Dcsp.sentinel.api.port=8719 \
+-Dproject.name=sentinel-dashboard \
+-Dspring.config.location=application.properties \
+-Dspring.profiles.active=test \
+-jar target/sentinel-dashboard.jar
+```
+
+## 新增配置说明
+> application.properties
+```
+spring.cloud.sentinel.datasource.nacos.server-addr=127.0.0.1:8848
+spring.cloud.sentinel.datasource.nacos.groupId=DEFAULT_GROUP
+spring.cloud.sentinel.datasource.nacos.namespace=7e7f03a6-0202-4b4c-900d-b53e6b585618
+```
+spring.cloud.sentinel.datasource.nacos.server-addr: nacos地址
+spring.cloud.sentinel.datasource.nacos.groupId: nacos组id
+spring.cloud.sentinel.datasource.nacos.namespace： nacos命名空间，可不设,默认为public
+
+
+## 其它微服务程序配置
+```
+spring:
+  application:
+    name: cloudali-sentinel-single
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 192.168.31.212:8848
+        #namespace: 7e7f03a6-0202-4b4c-900d-b53e6b585618
+    sentinel:
+      transport:
+        dashboard: 127.0.0.1:8888
+        port: 8719
+      datasource:
+        # 名称随意
+        flow:
+          nacos:
+            server-addr: 192.168.31.212:8848
+            namespace: 7e7f03a6-0202-4b4c-900d-b53e6b585618
+            dataId: ${spring.application.name}-flow-rules
+            groupId: SENTINEL_GROUP
+            # 规则类型，取值见：
+            # org.springframework.cloud.alibaba.sentinel.datasource.RuleType
+            rule-type: flow
+        degrade:
+          nacos:
+            server-addr: 192.168.31.212:8848
+            namespace: 7e7f03a6-0202-4b4c-900d-b53e6b585618
+            dataId: ${spring.application.name}-degrade-rules
+            groupId: SENTINEL_GROUP
+            rule-type: degrade
+        system:
+          nacos:
+            server-addr: 192.168.31.212:8848
+            namespace: 7e7f03a6-0202-4b4c-900d-b53e6b585618
+            dataId: ${spring.application.name}-system-rules
+            groupId: SENTINEL_GROUP
+            rule-type: system
+        authority:
+          nacos:
+            server-addr: 192.168.31.212:8848
+            namespace: 7e7f03a6-0202-4b4c-900d-b53e6b585618
+            dataId: ${spring.application.name}-authority-rules
+            groupId: SENTINEL_GROUP
+            rule-type: authority
+        param-flow:
+          nacos:
+            server-addr: 192.168.31.212:8848
+            namespace: 7e7f03a6-0202-4b4c-900d-b53e6b585618
+            dataId: ${spring.application.name}-param-flow-rules
+            groupId: SENTINEL_GROUP
+            rule-type: param-flow
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+```
+
 ## 0. 概述
 
 Sentinel 控制台是流量控制、熔断降级规则统一配置和管理的入口，它为用户提供了机器自发现、簇点链路自发现、监控、规则配置等功能。在 Sentinel 控制台上，我们可以配置规则并实时查看流量控制效果。
@@ -11,7 +97,8 @@ Sentinel 控制台是流量控制、熔断降级规则统一配置和管理的�
 使用如下命令将代码打包成一个 fat jar:
 
 ```bash
-mvn clean package
+mvn clean install -DskipTests
+# mvn clean package
 ```
 
 ### 1.2 如何启动
@@ -21,7 +108,9 @@ mvn clean package
 ```bash
 java -Dserver.port=8080 \
 -Dcsp.sentinel.dashboard.server=localhost:8080 \
+-Dcsp.sentinel.api.port=8719 \
 -Dproject.name=sentinel-dashboard \
+-Dspring.config.location=tmp/springboottmp/xxx.yaml \
 -jar target/sentinel-dashboard.jar
 ```
 
@@ -33,9 +122,9 @@ java -Dserver.port=8080 \
 
 | 参数 | 作用 |
 |--------|--------|
-|`Dcsp.sentinel.dashboard.server=localhost:8080`|向 Sentinel 接入端指定控制台的地址|
+|`-Dcsp.sentinel.dashboard.server=localhost:8080`|向 Sentinel 接入端指定控制台的地址|
 |`-Dproject.name=sentinel-dashboard`|向 Sentinel 指定应用名称，比如上面对应的应用名称就为 `sentinel-dashboard`|
-
+|`-Dcsp.sentinel.api.port=8719`| (默认8719) 客户端提供给Dashboard访问或者查看Sentinel的运行访问的参数|
 全部的配置项可以参考 [启动配置项文档](https://github.com/alibaba/Sentinel/wiki/%E5%90%AF%E5%8A%A8%E9%85%8D%E7%BD%AE%E9%A1%B9)。
 
 经过上述配置，控制台启动后会自动向自己发送心跳。程序启动后浏览器访问 `localhost:8080` 即可访问 Sentinel 控制台。
