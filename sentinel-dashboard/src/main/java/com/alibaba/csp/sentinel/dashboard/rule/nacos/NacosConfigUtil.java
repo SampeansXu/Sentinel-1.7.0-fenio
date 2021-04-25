@@ -9,10 +9,12 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.nacos.api.config.ConfigService;
 import com.alibaba.nacos.api.exception.NacosException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
@@ -43,6 +45,9 @@ public class NacosConfigUtil {
     public static final String SERVER_TRANSPORT_CONFIG_DATA_ID_POSTFIX = "-cs-transport-config";
     public static final String SERVER_FLOW_CONFIG_DATA_ID_POSTFIX = "-cs-flow-config";
     public static final String SERVER_NAMESPACE_SET_DATA_ID_POSTFIX = "-cs-namespace-set";
+
+    @Value("${nacos.save.waittime:1}")
+    private Integer nacosSaveWaitTime;
 
     /**
      * 将规则序列化成JSON文本，存储到Nacos server中
@@ -96,7 +101,10 @@ public class NacosConfigUtil {
      * @return 规则对象列表
      * @throws NacosException 异常
      */
-    public <T> List<T> getRuleEntitiesFromNacos(ConfigService configService, String appName, String postfix, Class<T> clazz) throws NacosException {
+    public <T> List<T> getRuleEntitiesFromNacos(ConfigService configService, String appName, String postfix, Class<T> clazz) throws NacosException, InterruptedException {
+        // TODO add by fenio 数据存储到Nacos。查询数据需要等待Save完成了才行
+        TimeUnit.SECONDS.sleep(nacosSaveWaitTime);
+
         String rules = configService.getConfig(
                 genDataId(appName, postfix) + DASHBOARD_POSTFIX,
                 //genDataId(appName, postfix),
