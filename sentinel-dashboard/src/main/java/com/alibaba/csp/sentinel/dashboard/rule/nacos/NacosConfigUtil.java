@@ -46,7 +46,7 @@ public class NacosConfigUtil {
     public static final String SERVER_FLOW_CONFIG_DATA_ID_POSTFIX = "-cs-flow-config";
     public static final String SERVER_NAMESPACE_SET_DATA_ID_POSTFIX = "-cs-namespace-set";
 
-    @Value("${nacos.save.waittime:1}")
+    @Value("${nacos.save.waittime:600}")
     private Integer nacosSaveWaitTime;
 
     /**
@@ -103,7 +103,7 @@ public class NacosConfigUtil {
      */
     public <T> List<T> getRuleEntitiesFromNacos(ConfigService configService, String appName, String postfix, Class<T> clazz) throws NacosException, InterruptedException {
         // TODO add by fenio 数据存储到Nacos。查询数据需要等待Save完成了才行
-        TimeUnit.SECONDS.sleep(nacosSaveWaitTime);
+        TimeUnit.MILLISECONDS.sleep(nacosSaveWaitTime);
 
         String rules = configService.getConfig(
                 genDataId(appName, postfix) + DASHBOARD_POSTFIX,
